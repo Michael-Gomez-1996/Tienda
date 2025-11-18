@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tienda Demo - Proyecto</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <h1>Tienda Demo</h1>
+    <div id="user-area">
+      <!-- Botón de login en lugar del formulario -->
+      <button id="login-btn" class="login-btn">Iniciar sesión</button>
+      <div id="user-info" class="hidden">
+        <span id="welcome"></span>
+        <button id="logout-btn">Cerrar sesión</button>
+      </div>
+      
+      <!-- Botón del carrito con contador -->
+      <button id="carrito-btn" class="carrito-btn">
+        🛒 <span id="carrito-contador" class="carrito-contador"></span>
+      </button>
+    </div>
+  </header>
+
+  <main class="main">
+    <section id="catalogo-productos" class="catalogo">
+      <!-- Aquí se cargarán las tarjetas de producto -->
+    </section>
+  </main>
+
+  <!-- Modal del carrito -->
+  <div id="carrito-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Tu Carrito de Compras</h2>
+        <button id="cerrar-carrito" class="cerrar-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="carrito-items"></div>
+        <div id="carrito-total" class="total"></div>
+        <div class="modal-actions">
+          <button id="vaciar-carrito" class="btn-secundario">Vaciar carrito</button>
+          <button id="comprar-btn" class="btn-principal">Comprar ahora</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de login -->
+  <div id="login-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Iniciar Sesión</h2>
+        <button id="cerrar-login" class="cerrar-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="login-form" class="login-form">
+          <div class="form-group">
+            <label for="username">Usuario:</label>
+            <input type="text" id="username" placeholder="john@mail.com" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" placeholder="changeme" required />
+          </div>
+          <button type="submit" class="btn-principal">Entrar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de confirmación de compra -->
+  <div id="confirmar-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Confirmar Compra</h2>
+        <button id="cerrar-confirmar" class="cerrar-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="mensaje-confirmacion">¿Estás seguro de que deseas realizar la compra?</p>
+        <div class="modal-actions">
+          <button id="cancelar-compra" class="btn-secundario">Cancelar</button>
+          <button id="confirmar-compra" class="btn-principal">Confirmar Compra</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <small>Proyecto final - INTRODUCCION A LOS LENGUAJES DE INTERNET </small>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
