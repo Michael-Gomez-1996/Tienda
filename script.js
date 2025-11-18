@@ -373,6 +373,9 @@ function setupAuth(){
   const usernameInput = document.getElementById('username');
   const passwordInput = document.getElementById('password');
 
+  // CERRAR MODAL DE LOGIN AL CARGAR LA PÁGINA - ESTA ES LA CORRECCIÓN
+  modalManager.cerrarModal('login-modal');
+
   const savedUser = localStorage.getItem('demo_user');
   if(savedUser){
     const u = JSON.parse(savedUser);
