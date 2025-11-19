@@ -1,33 +1,38 @@
 // script.js
-// API de PRODUCTOS - FakeStoreAPI (con imágenes funcionando)
+// API de PRODUCTOS - FakeStoreAPI (para obtener productos con imágenes)
 const PRODUCTS_ENDPOINT = 'https://fakestoreapi.com/products';
 
-// API de LOGIN - EscuelaJS (la que ya funciona)
+// API de LOGIN - EscuelaJS (para autenticación de usuarios)
 const USERS_ENDPOINT = 'https://api.escuelajs.co/api/v1/users';
 
 /* --------------------------
-  Helper: custom descriptions
+  Helper: Descripciones personalizadas
 ---------------------------*/
+// Función que crea descripciones personalizadas para los productos
 function makeCustomDescription(product){
+  // Combina la categoría con los primeros 100 caracteres de la descripción
   return `Producto premium: ${product.category}. ${product.description?.substring(0, 100)}...`;
 }
 
 /* --------------------------
-  Gestión de Modales
+  Gestión de Modales - Controla la apertura/cierre de ventanas modales
 ---------------------------*/
 const modalManager = {
+  // Abre un modal por su ID
   abrirModal(id) {
     const modal = document.getElementById(id);
-    modal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
+    modal.classList.remove('hidden'); // Muestra el modal
+    document.body.style.overflow = 'hidden'; // Evita scroll en el fondo
   },
   
+  // Cierra un modal por su ID
   cerrarModal(id) {
     const modal = document.getElementById(id);
-    modal.classList.add('hidden');
-    document.body.style.overflow = 'auto';
+    modal.classList.add('hidden'); // Oculta el modal
+    document.body.style.overflow = 'auto'; // Restaura el scroll
   },
   
+  // Cierra todos los modales de la página
   cerrarTodosModales() {
     document.querySelectorAll('.modal').forEach(modal => {
       modal.classList.add('hidden');
@@ -35,8 +40,9 @@ const modalManager = {
     document.body.style.overflow = 'auto';
   },
   
+  // Configura todos los event listeners para los modales
   setupModalListeners() {
-    // Cerrar modales al hacer click fuera
+    // Cerrar modales al hacer click fuera del contenido
     document.querySelectorAll('.modal').forEach(modal => {
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
@@ -45,7 +51,7 @@ const modalManager = {
       });
     });
     
-    // Botones de cerrar
+    // Botones de cerrar específicos para cada modal
     document.getElementById('cerrar-carrito').addEventListener('click', () => {
       this.cerrarModal('carrito-modal');
     });
@@ -62,7 +68,7 @@ const modalManager = {
       this.cerrarModal('confirmar-modal');
     });
     
-    // Botones de abrir
+    // Botones de abrir modales
     document.getElementById('carrito-btn').addEventListener('click', () => {
       this.abrirModal('carrito-modal');
     });
@@ -74,16 +80,18 @@ const modalManager = {
 };
 
 /* --------------------------
-  Carrito: objeto con estado y métodos
+  Carrito: Objeto que gestiona el carrito de compras con estado y métodos
 ---------------------------*/
 const carrito = {
-  items: [],
+  items: [], // Array que almacena los productos en el carrito
   
+  // Agrega un producto al carrito o incrementa su cantidad si ya existe
   agregarItem(product){
     const found = this.items.find(i => i.id === product.id);
     if(found){
-      found.qty += 1;
+      found.qty += 1; // Incrementa cantidad si ya existe
     } else {
+      // Agrega nuevo producto al carrito
       this.items.push({
         id: product.id,
         title: product.title,
@@ -93,11 +101,12 @@ const carrito = {
         customDescription: product.customDescription
       });
     }
-    this.save();
-    this.renderizarCarrito();
-    this.mostrarNotificacion('Producto añadido al carrito');
+    this.save(); // Guarda en localStorage
+    this.renderizarCarrito(); // Actualiza la vista
+    this.mostrarNotificacion('Producto añadido al carrito'); // Muestra notificación
   },
   
+  // Elimina un producto del carrito por su ID
   removerItem(productId){
     this.items = this.items.filter(i => i.id !== productId);
     this.save();
@@ -105,15 +114,17 @@ const carrito = {
     this.mostrarNotificacion('Producto eliminado');
   },
   
+  // Cambia la cantidad de un producto específico
   cambiarCantidad(productId, qty){
     const item = this.items.find(i => i.id === productId);
     if(!item) return;
     item.qty = qty;
-    if(item.qty <= 0) this.removerItem(productId);
+    if(item.qty <= 0) this.removerItem(productId); // Elimina si cantidad es 0 o menos
     this.save();
     this.renderizarCarrito();
   },
   
+  // Incrementa en 1 la cantidad de un producto
   aumentarCantidad(productId) {
     const item = this.items.find(i => i.id === productId);
     if (item) {
@@ -123,6 +134,7 @@ const carrito = {
     }
   },
   
+  // Disminuye en 1 la cantidad de un producto (mínimo 1)
   disminuirCantidad(productId) {
     const item = this.items.find(i => i.id === productId);
     if (item && item.qty > 1) {
@@ -132,18 +144,22 @@ const carrito = {
     }
   },
   
+  // Calcula el total de la compra sumando todos los items
   calcularTotal(){
     return this.items.reduce((acc, it) => acc + it.price * it.qty, 0);
   },
   
+  // Calcula la cantidad total de productos en el carrito
   obtenerCantidadTotal(){
     return this.items.reduce((total, item) => total + item.qty, 0);
   },
   
+  // Verifica si el carrito tiene items
   tieneItems(){
     return this.items.length > 0;
   },
   
+  // Muestra una notificación temporal en la esquina superior derecha
   mostrarNotificacion(mensaje) {
     const notificacion = document.createElement('div');
     notificacion.className = 'notificacion';
@@ -162,19 +178,22 @@ const carrito = {
     
     document.body.appendChild(notificacion);
     
+    // Elimina la notificación después de 2 segundos
     setTimeout(() => {
       notificacion.remove();
     }, 2000);
   },
   
+  // Renderiza la interfaz del carrito en el modal
   renderizarCarrito(){
     const container = document.getElementById('carrito-items');
     const totalElement = document.getElementById('carrito-total');
     const vaciarBtn = document.getElementById('vaciar-carrito');
     const comprarBtn = document.getElementById('comprar-btn');
     
-    container.innerHTML = '';
+    container.innerHTML = ''; // Limpia el contenedor
     
+    // Si el carrito está vacío, muestra mensaje y oculta botones
     if(!this.tieneItems()){
       container.innerHTML = '<p class="carrito-vacio">El carrito está vacío</p>';
       totalElement.textContent = 'Total: $0.00';
@@ -184,9 +203,11 @@ const carrito = {
       return;
     }
     
+    // Muestra botones si hay items
     vaciarBtn.style.display = 'block';
     comprarBtn.style.display = 'block';
     
+    // Renderiza cada item del carrito
     this.items.forEach(it => {
       const div = document.createElement('div');
       div.className = 'carrito-item';
@@ -210,6 +231,7 @@ const carrito = {
       container.appendChild(div);
     });
 
+    // Calcula y muestra el total
     const total = this.calcularTotal();
     totalElement.innerHTML = `
       <div class="total-info">
@@ -223,6 +245,7 @@ const carrito = {
     this.agregarEventListenersCarrito();
   },
   
+  // Actualiza el contador de productos en el icono del carrito
   actualizarContadorCarrito() {
     const contador = document.getElementById('carrito-contador');
     const cantidad = this.obtenerCantidadTotal();
@@ -230,7 +253,9 @@ const carrito = {
     contador.style.display = cantidad > 0 ? 'flex' : 'none';
   },
   
+  // Agrega event listeners a los controles de cantidad del carrito
   agregarEventListenersCarrito() {
+    // Botones de incrementar cantidad
     document.querySelectorAll('.qty-btn.plus').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const id = Number(e.target.dataset.id);
@@ -238,6 +263,7 @@ const carrito = {
       });
     });
     
+    // Botones de disminuir cantidad
     document.querySelectorAll('.qty-btn.minus').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const id = Number(e.target.dataset.id);
@@ -245,14 +271,16 @@ const carrito = {
       });
     });
     
+    // Inputs de cantidad (cambio manual)
     document.querySelectorAll('.item-qty').forEach(input => {
       input.addEventListener('change', (e) => {
         const id = Number(e.target.dataset.id);
-        const qty = Math.max(1, Number(e.target.value) || 1);
+        const qty = Math.max(1, Number(e.target.value) || 1); // Mínimo 1
         this.cambiarCantidad(id, qty);
       });
     });
     
+    // Botones de eliminar producto
     document.querySelectorAll('.remove').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const id = Number(e.target.dataset.id);
@@ -263,6 +291,7 @@ const carrito = {
     });
   },
   
+  // Prepara la compra mostrando el modal de confirmación
   procesarCompra() {
     if (!this.tieneItems()) {
       alert('El carrito está vacío');
@@ -276,11 +305,12 @@ const carrito = {
     modalManager.abrirModal('confirmar-modal');
   },
   
+  // Confirma y procesa la compra (simulación)
   confirmarCompra() {
     // Simular proceso de compra
     this.mostrarNotificacion('¡Compra realizada con éxito!');
     
-    // Limpiar carrito
+    // Limpiar carrito después de la compra
     this.items = [];
     this.save();
     this.renderizarCarrito();
@@ -288,12 +318,14 @@ const carrito = {
     modalManager.cerrarModal('confirmar-modal');
   },
   
+  // Guarda el carrito en localStorage
   save(){
     try{
       localStorage.setItem('carrito_v1', JSON.stringify(this.items));
     }catch(e){ console.warn('No se pudo guardar carrito', e); }
   },
   
+  // Carga el carrito desde localStorage
   load(){
     try{
       const raw = localStorage.getItem('carrito_v1');
@@ -301,6 +333,7 @@ const carrito = {
     }catch(e){ console.warn('No se pudo cargar carrito', e); }
   },
   
+  // Vacía todo el carrito previa confirmación
   clear(){
     if(this.tieneItems() && confirm('¿Vaciar todo el carrito?')) {
       this.items = [];
@@ -311,25 +344,29 @@ const carrito = {
   }
 };
 
-// escape simple para evitar inyección en strings
+// Función de utilidad para escapar HTML y prevenir inyección
 function escapeHtml(str){
   return String(str).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
 }
 
 /* --------------------------
-  Renderizado de productos
+  Renderizado de productos - Obtiene y muestra los productos en el catálogo
 ---------------------------*/
 async function fetchAndRenderProducts(){
   const container = document.getElementById('catalogo-productos');
   container.innerHTML = '<p class="cargando">Cargando productos...</p>';
+  
   try{
+    // Fetch a la API de productos
     const res = await fetch(PRODUCTS_ENDPOINT);
     if(!res.ok) throw new Error('Error al obtener productos');
     const products = await res.json();
 
-    container.innerHTML = '';
-    products.forEach(p=>{
-      p.customDescription = makeCustomDescription(p);
+    container.innerHTML = ''; // Limpia el loading
+    
+    // Crea una tarjeta para cada producto
+    products.forEach(p => {
+      p.customDescription = makeCustomDescription(p); // Añade descripción personalizada
 
       const card = document.createElement('article');
       card.className = 'card';
@@ -346,10 +383,11 @@ async function fetchAndRenderProducts(){
       container.appendChild(card);
     });
 
-    container.querySelectorAll('.add-to-cart').forEach(btn=>{
-      btn.addEventListener('click', (e)=>{
+    // Agrega event listeners a los botones "Añadir al carrito"
+    container.querySelectorAll('.add-to-cart').forEach(btn => {
+      btn.addEventListener('click', (e) => {
         const id = Number(e.target.dataset.id);
-        const product = products.find(x=> x.id === id);
+        const product = products.find(x => x.id === id);
         carrito.agregarItem(product);
       });
     });
@@ -361,7 +399,7 @@ async function fetchAndRenderProducts(){
 }
 
 /* --------------------------
-  Login
+  Sistema de Autenticación - Maneja login/logout de usuarios
 ---------------------------*/
 function setupAuth(){
   const loginForm = document.getElementById('login-form');
@@ -373,36 +411,43 @@ function setupAuth(){
   const usernameInput = document.getElementById('username');
   const passwordInput = document.getElementById('password');
 
-  // CERRAR MODAL DE LOGIN AL CARGAR LA PÁGINA - ESTA ES LA CORRECCIÓN
+  // Cierra el modal de login al cargar la página (medida de seguridad)
   modalManager.cerrarModal('login-modal');
 
+  // Verifica si hay un usuario guardado en localStorage
   const savedUser = localStorage.getItem('demo_user');
   if(savedUser){
     const u = JSON.parse(savedUser);
-    showUser(u.name);
+    showUser(u.name); // Muestra la información del usuario
   }
 
-  loginForm.addEventListener('submit', async (e)=>{
+  // Maneja el envío del formulario de login
+  loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = usernameInput.value.trim();
     const password = passwordInput.value.trim();
     if(!email || !password) return alert('Pon email y contraseña.');
 
     try{
+      // Obtiene todos los usuarios de la API
       const res = await fetch(USERS_ENDPOINT);
       if(!res.ok) throw new Error('Error al verificar usuarios');
       const users = await res.json();
 
+      // Busca el usuario con las credenciales proporcionadas
       const user = users.find(u => u.email === email && u.password === password);
       
       if(user){
+        // Simula la generación de un token
         const mockToken = 'token_' + Date.now() + '_' + user.id;
         
+        // Guarda la información del usuario en localStorage
         localStorage.setItem('demo_user', JSON.stringify({ 
           username: user.email, 
           name: user.name,
           token: mockToken 
         }));
+        
         showUser(user.name);
         modalManager.cerrarModal('login-modal');
         alert(`¡Bienvenido ${user.name}!`);
@@ -415,18 +460,21 @@ function setupAuth(){
     }
   });
 
-  logoutBtn.addEventListener('click', ()=>{
-    localStorage.removeItem('demo_user');
-    hideUser();
+  // Maneja el logout del usuario
+  logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('demo_user'); // Elimina datos de usuario
+    hideUser(); // Oculta información del usuario
     alert('Sesión cerrada correctamente.');
   });
 
+  // Muestra la información del usuario logueado
   function showUser(name){
     loginBtn.classList.add('hidden');
     userInfo.classList.remove('hidden');
     welcome.textContent = `Hola ${name}`;
   }
   
+  // Oculta la información del usuario y limpia el formulario
   function hideUser(){
     loginBtn.classList.remove('hidden');
     userInfo.classList.add('hidden');
@@ -436,32 +484,32 @@ function setupAuth(){
 }
 
 /* --------------------------
-  Inicialización
+  Inicialización de la aplicación - Se ejecuta cuando el DOM está listo
 ---------------------------*/
-document.addEventListener('DOMContentLoaded', async ()=> {
-  // Inicializar modales
+document.addEventListener('DOMContentLoaded', async () => {
+  // Inicializar sistema de modales
   modalManager.setupModalListeners();
   
-  // Inicializar carrito
+  // Cargar carrito desde localStorage y renderizarlo
   carrito.load();
   carrito.renderizarCarrito();
   
-  // Configurar autenticación
+  // Configurar sistema de autenticación
   setupAuth();
   
-  // Cargar productos
+  // Cargar y mostrar productos del catálogo
   await fetchAndRenderProducts();
 
-  // Event listeners adicionales
-  document.getElementById('vaciar-carrito').addEventListener('click', ()=>{
-    carrito.clear();
+  // Event listeners adicionales para botones del carrito
+  document.getElementById('vaciar-carrito').addEventListener('click', () => {
+    carrito.clear(); // Vacía el carrito
   });
   
-  document.getElementById('comprar-btn').addEventListener('click', ()=>{
-    carrito.procesarCompra();
+  document.getElementById('comprar-btn').addEventListener('click', () => {
+    carrito.procesarCompra(); // Inicia proceso de compra
   });
   
-  document.getElementById('confirmar-compra').addEventListener('click', ()=>{
-    carrito.confirmarCompra();
+  document.getElementById('confirmar-compra').addEventListener('click', () => {
+    carrito.confirmarCompra(); // Confirma la compra
   });
 });

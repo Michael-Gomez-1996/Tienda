@@ -145,7 +145,7 @@ body {
   grid-column: 1 / -1;
 }
 
-/* TARJETAS - MISMO TAMAÑO PARA TODAS */
+/* TARJETAS - */
 .card {
   background: var(--card-bg);
   border-radius: var(--radius);
@@ -234,7 +234,7 @@ body {
 }
 
 /* ===============================
-   🎨 MODALES Y NUEVOS BOTONES
+   🎨 MODALES 
    =============================== */
 
 /* Modales */
@@ -398,7 +398,7 @@ body {
   font-size: 0.9rem;
 }
 
-/* Controles de cantidad mejorados */
+/* Controles de cantidad  */
 .qty-controls {
   display: flex;
   align-items: center;
@@ -444,7 +444,7 @@ body {
   transform: scale(1.1);
 }
 
-/* Total mejorado */
+/* Total  */
 .total-info {
   text-align: right;
   padding: 10px 0;
@@ -530,7 +530,7 @@ body {
   margin-top: auto;
 }
 
-/* ---------- RESPONSIVE MEJORADO ---------- */
+/* ---------- RESPONSIVE ---------- */
 @media (max-width: 768px) {
   .header {
     padding: 12px 15px;
@@ -555,7 +555,7 @@ body {
   
   .card {
     padding: 12px;
-    height: 420px; /* ALTURA AJUSTADA PARA MÓVIL */
+    height: 420px; 
   }
   
   .card button {
@@ -606,7 +606,7 @@ body {
   }
   
   .card {
-    height: 400px; /* ALTURA AJUSTADA PARA PANTALLAS PEQUEÑAS */
+    height: 400px; 
   }
   
   .card button {
@@ -653,6 +653,6 @@ body {
   
   .card {
     padding: 10px;
-    height: 380px; /* ALTURA AJUSTADA PARA PANTALLAS MUY PEQUEÑAS */
+    height: 380px; 
   }
 }
